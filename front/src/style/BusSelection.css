@@ -1,0 +1,380 @@
+.bus-selection-page {
+  --bus-primary: #0875e1;
+  --bus-dark: #075484;
+  --bus-text: #0d3464;
+  --bus-muted: #7a8aa0;
+  --bus-border: #c9d9ea;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: var(--bus-text);
+  background: #f7fafc;
+}
+
+/* Cabeçalho */
+
+.bus-screen-header {
+  position: relative;
+  display: flex;
+  flex: 0 0 77px;
+  align-items: flex-end;
+  justify-content: center;
+  padding:
+    max(15px, env(safe-area-inset-top))
+    55px
+    10px;
+  color: #fff;
+  background: var(--bus-dark);
+}
+
+.bus-screen-header h1 {
+  max-width: 230px;
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.bus-screen-header button {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Saudação */
+
+.bus-greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 11px 13px 12px;
+  padding: 5px 3px 7px;
+  color: #fff;
+  background: var(--bus-dark);
+}
+
+.bus-greeting h2 {
+  margin: 0 0 2px;
+  font-size: 19px;
+  line-height: 1.1;
+}
+
+.bus-greeting p {
+  margin: 0;
+  font-size: 11px;
+}
+
+.bus-greeting > svg {
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+/* Conteúdo */
+
+.bus-selection-content {
+  padding: 0 13px;
+}
+
+/* Tabela de ônibus */
+
+.bus-list-container {
+  overflow: hidden;
+  border: 1px solid var(--bus-border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.bus-table-header {
+  display: grid;
+  grid-template-columns:
+    minmax(112px, 1.5fr)
+    minmax(54px, 0.8fr)
+    46px
+    minmax(73px, 1fr);
+  align-items: center;
+  min-height: 33px;
+  padding: 0 7px;
+  color: #607592;
+  font-size: 9px;
+  text-align: center;
+}
+
+.bus-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.bus-row {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    18px
+    minmax(94px, 1.5fr)
+    minmax(54px, 0.8fr)
+    46px
+    minmax(73px, 1fr);
+  align-items: center;
+  min-height: 45px;
+  padding: 0 7px;
+  border-top: 1px solid #e5ebf2;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.bus-row-selected {
+  z-index: 2;
+  margin: -1px;
+  border: 1.5px solid var(--bus-primary);
+  border-radius: 9px;
+  background: #f7fbff;
+}
+
+.bus-row input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.custom-radio {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #7c94ad;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.bus-row input:checked + .custom-radio {
+  border-color: var(--bus-primary);
+  background: var(--bus-primary);
+}
+
+.bus-row input:checked + .custom-radio::after {
+  content: "✓";
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bus-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.bus-name strong {
+  overflow: hidden;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bus-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--bus-dark);
+}
+
+.bus-destination,
+.bus-arrival {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bus-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 21px;
+  padding: 3px 4px;
+  white-space: nowrap;
+  font-size: 8px;
+}
+
+.bus-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.bus-status-on-time {
+  color: #15875d;
+  background: #d8f7e7;
+}
+
+.bus-status-on-time .bus-status-dot {
+  background: #20b77c;
+}
+
+.bus-status-delayed {
+  color: #b97800;
+  background: #fff1cb;
+}
+
+.bus-status-delayed .bus-status-dot {
+  background: #f0a800;
+}
+
+.bus-status-moving {
+  color: #52769c;
+  background: #edf3fa;
+}
+
+.bus-status-moving .bus-status-dot {
+  background: #6c91ba;
+}
+
+/* Card da escolha */
+
+.selected-bus-card {
+  margin-top: 13px;
+  padding: 14px 13px;
+  border: 1px solid var(--bus-border);
+  border-radius: 12px;
+  background: #eaf3ff;
+}
+
+.selected-bus-card h2 {
+  margin: 0 0 11px;
+  font-size: 15px;
+}
+
+.selected-bus-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.selected-bus-icon {
+  display: grid;
+  place-items: center;
+  width: 51px;
+  height: 51px;
+  border-radius: 50%;
+  color: var(--bus-dark);
+  background: #d5e9ff;
+}
+
+.selected-bus-content strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17px;
+}
+
+.selected-bus-content p {
+  margin: 0;
+  color: var(--bus-muted);
+  font-size: 11px;
+}
+
+.selected-bus-content b {
+  margin-left: 4px;
+  color: var(--bus-text);
+  font-size: 13px;
+}
+
+/* Botão principal */
+
+.choose-bus-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 41px;
+  margin-top: 12px;
+  padding: 9px 16px;
+  border: 1px solid var(--bus-primary);
+  border-radius: 8px;
+  color: #fff;
+  background: var(--bus-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.choose-bus-button.confirmed {
+  border-color: #168b64;
+  background: #168b64;
+}
+
+.bus-page-space {
+  flex: 1;
+  min-height: 35px;
+}
+
+/* Foco de acessibilidade */
+
+.bus-selection-page button:focus-visible,
+.bus-row input:focus-visible + .custom-radio {
+  outline: 3px solid rgba(8, 117, 225, 0.3);
+  outline-offset: 2px;
+}
+
+/* Caso o BottomNavigation ainda não possua CSS próprio */
+
+.bottom-navigation {
+  position: sticky;
+  z-index: 10;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 7px 12px max(8px, env(safe-area-inset-bottom));
+  border-top: 1px solid #dce5ee;
+  background: #fff;
+}
+
+.bottom-navigation button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 4px;
+  border: none;
+  border-radius: 12px;
+  color: #8494a7;
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.bottom-navigation button.active {
+  color: var(--bus-primary);
+  font-weight: 700;
+}
+
+/* Visualização em computador */
+
+@media (min-width: 700px) {
+  .bus-selection-page {
+    max-width: 430px;
+    min-height: calc(100dvh - 32px);
+    margin: 16px auto;
+    border-radius: 26px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+}

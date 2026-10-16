@@ -1,0 +1,340 @@
+.nearby-page {
+  --nearby-primary: #0875ea;
+  --nearby-dark-blue: #075385;
+  --nearby-text: #103965;
+  --nearby-muted: #71839a;
+  --nearby-border: #cbdcec;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: var(--nearby-text);
+  background: #f8fbfd;
+}
+
+/* Cabeçalho */
+
+.nearby-header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex: 0 0 76px;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) 18px 8px;
+  color: #fff;
+  background: var(--nearby-dark-blue);
+}
+
+.nearby-header h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.nearby-back-button {
+  position: absolute;
+  left: 14px;
+  bottom: 17px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nearby-back-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Mapa */
+
+.nearby-map {
+  position: relative;
+  flex: 0 0 240px;
+  overflow: hidden;
+  background: #e8eeec;
+}
+
+.nearby-map-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-green-area {
+  fill: #cae2bf;
+}
+
+.map-road {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.map-road-thin {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 3;
+}
+
+.map-region-label {
+  position: absolute;
+  color: #78919a;
+  font-size: 11px;
+}
+
+.map-uniao {
+  top: 14%;
+  left: 6%;
+}
+
+.map-street-label {
+  position: absolute;
+  color: #9aa7aa;
+  font-size: 7px;
+}
+
+.street-one {
+  top: 51%;
+  left: 7%;
+  transform: rotate(43deg);
+}
+
+.street-two {
+  top: 16%;
+  left: 49%;
+  transform: rotate(43deg);
+}
+
+.map-campus {
+  position: absolute;
+  top: 17%;
+  right: 9%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: #1b4e70;
+  font-size: 9px;
+}
+
+.nearby-map-marker {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--nearby-primary);
+  box-shadow: 0 3px 8px rgba(8, 80, 150, 0.2);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.current-location {
+  position: absolute;
+  top: 55%;
+  left: 49%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #123e60;
+  font-size: 9px;
+  line-height: 1.1;
+  transform: translate(-50%, -50%);
+}
+
+.current-location-pin {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  margin-bottom: 2px;
+  border: 1px solid #0b85f4;
+  border-radius: 50%;
+  color: var(--nearby-primary);
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(7, 83, 133, 0.18);
+}
+
+.current-location strong {
+  font-weight: 700;
+}
+
+.you-are-here {
+  position: absolute;
+  bottom: 16%;
+  left: 11%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border-radius: 12px;
+  color: var(--nearby-primary);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 9px;
+}
+
+.you-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--nearby-primary);
+}
+
+.nearby-location-button {
+  position: absolute;
+  right: 6%;
+  bottom: 8%;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  color: #74879c;
+  background: #fff;
+  box-shadow: 0 4px 11px rgba(29, 64, 101, 0.15);
+  cursor: pointer;
+}
+
+/* Informações do ponto */
+
+.nearby-point-section {
+  padding: 14px 16px 13px;
+  background: #fff;
+}
+
+.nearby-point-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 65px;
+  padding: 10px 14px;
+  border: 1px solid var(--nearby-border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.point-bus-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  color: var(--nearby-dark-blue);
+}
+
+.point-information h2 {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.point-information p {
+  margin: 0;
+  color: var(--nearby-muted);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.use-point-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  margin-top: 11px;
+  padding: 8px 16px;
+  border: 1px solid var(--nearby-primary);
+  border-radius: 8px;
+  color: #fff;
+  background: var(--nearby-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.use-point-button.selected {
+  border-color: #128a63;
+  background: #128a63;
+}
+
+.nearby-empty-space {
+  flex: 1;
+  min-height: 40px;
+  background: #fff;
+}
+
+/* Navegação inferior */
+
+.bottom-navigation {
+  position: sticky;
+  z-index: 10;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 7px 12px max(8px, env(safe-area-inset-bottom));
+  border-top: 1px solid #e0e7ef;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.bottom-navigation button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 4px;
+  border: none;
+  border-radius: 12px;
+  color: #8795a8;
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.bottom-navigation button.active {
+  color: var(--nearby-primary);
+  font-weight: 700;
+}
+
+.nearby-page button:focus-visible {
+  outline: 3px solid rgba(8, 117, 234, 0.3);
+  outline-offset: 2px;
+}
+
+/* Visualização em computador */
+
+@media (min-width: 700px) {
+  body {
+    background: #202020;
+  }
+
+  .nearby-page {
+    max-width: 430px;
+    min-height: calc(100dvh - 32px);
+    margin: 16px auto;
+    border-radius: 26px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+}
