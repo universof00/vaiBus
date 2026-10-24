@@ -5,35 +5,50 @@ import NearbyPointCard from "../components/NearbyPointCard";
 import BottomNavigation from "../components/BottomNavigation";
 import "../style/NearbyPoints.css";
 
-const selectedPoint = {
-  id: 1,
-  name: "Ponto Praça da Prefeitura",
-  distance: "320 m",
-  nextBus: "10 min",
-};
-
 function NearbyPoints() {
   const [activeTab, setActiveTab] = useState("mapa");
   const [pointConfirmed, setPointConfirmed] = useState(false);
 
-  function handleSelectPoint() {
-    setPointConfirmed(true);
+  const [userPosition, setUserPosition] =
+    useState(null);
 
-    // Futuramente, você poderá navegar para outra página:
-    // navigate("/viagens");
+  const [selectedPoint, setSelectedPoint] =
+    useState(null);
+
+  const [confirmedPoint, setConfirmedPoint] =
+    useState(null);
+
+  function handleConfirmPoint(point) {
+    setConfirmedPoint(point);
+
+    // Futuramente você poderá salvar no backend:
+    console.log("Ponto confirmado:", point);
   }
 
   return (
     <main className="nearby-page">
       <PageHeader title="Pontos próximos" />
 
-      <NearbyMap />
-
-      <NearbyPointCard
-        point={selectedPoint}
-        selected={pointConfirmed}
-        onSelect={handleSelectPoint}
+      <NearbyMap
+        onSelectStop={setSelectedPoint}
+        onLocationChange={setUserPosition}
       />
+
+      {selectedPoint ? (
+        <NearbyPointCard
+          point={selectedPoint}
+          userPosition={userPosition}
+          confirmed={
+            confirmedPoint?.id === selectedPoint.id
+          }
+          onConfirm={handleConfirmPoint}
+        />
+      ) : (
+        <p className="select-point-message">
+          Toque em um ponto no mapa para visualizar
+          suas informações.
+        </p>
+      )}
 
       <div className="nearby-empty-space" />
 

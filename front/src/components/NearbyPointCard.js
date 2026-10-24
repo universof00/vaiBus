@@ -1,11 +1,83 @@
 import React from "react";
 import Icon from "./Icon";
 
+import { useNavigate } from "react-router-dom";
+
+function calculateDistance(userPosition, pointPosition) {
+  if (!userPosition || !pointPosition) {
+    return null;
+  }
+
+  const earthRadius = 6371;
+
+  const userLatitude = userPosition.latitude;
+  const userLongitude = userPosition.longitude;
+
+  const pointLatitude = pointPosition.latitude;
+  const pointLongitude = pointPosition.longitude;
+
+  const latitudeDifference =
+    ((pointLatitude - userLatitude) * Math.PI) / 180;
+
+  const longitudeDifference =
+    ((pointLongitude - userLongitude) * Math.PI) / 180;
+
+  const firstLatitude = (userLatitude * Math.PI) / 180;
+  const secondLatitude = (pointLatitude * Math.PI) / 180;
+
+  const a =
+    Math.sin(latitudeDifference / 2) ** 2 +
+    Math.cos(firstLatitude) *
+      Math.cos(secondLatitude) *
+      Math.sin(longitudeDifference / 2) ** 2;
+
+  const distance =
+    2 *
+    earthRadius *
+    Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return distance;
+}
+
+function formatDistance(distanceInKm) {
+  if (distanceInKm === null) {
+    return "Calculando distância...";
+  }
+
+  if (distanceInKm < 1) {
+    return `${Math.round(distanceInKm * 1000)} metros`;
+  }
+
+  return `${distanceInKm
+    .toFixed(1)
+    .replace(".", ",")} km`;
+}
+
 function NearbyPointCard({
   point,
-  selected,
-  onSelect,
+  userPosition,
+  confirmed,
+  onConfirm,
 }) {
+  const distance = calculateDistance(
+    userPosition,
+    point
+  );
+
+  const navigate = useNavigate();
+
+function handleChoosePoint() {
+    // Confirma o ponto na página anterior
+    onConfirm(point);
+
+    // Abre a tela de ônibus e envia o ponto escolhido
+    navigate("/buses", {
+      state: {
+        selectedPoint: point,
+      },
+    });
+  }
+
   return (
     <section className="nearby-point-section">
       <article className="nearby-point-card">
@@ -15,29 +87,29 @@ function NearbyPointCard({
 
         <div className="point-information">
           <h2>{point.name}</h2>
-          <p>{point.distance} de distância</p>
-          <p>Próximo ônibus: {point.nextBus}</p>
+
+          <p>
+            <Icon name="walk" size={15} />
+            {formatDistance(distance)} de distância
+          </p>
+
+          <p>
+            <Icon name="bus" size={15} />
+            Próximo ônibus:{" "}
+            {point.nextBus || "Horário não disponível"}
+          </p>
         </div>
       </article>
 
       <button
-        className={`use-point-button ${selected ? "selected" : ""}`}
+        className="use-point-button"
         type="button"
-        aria-pressed={selected}
-        onClick={onSelect}
+        onClick={handleChoosePoint}
       >
-        {selected ? (
-          <>
-            <Icon name="pin" size={20} />
-            Ponto selecionado
-          </>
-        ) : (
-          <>
-            <Icon name="walk" size={20} />
-            Usar este ponto
-          </>
-        )}
+        <Icon name="bus" size={20} />
+        Ver ônibus disponíveis
       </button>
+      
     </section>
   );
 }

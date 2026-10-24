@@ -1,122 +1,328 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Circle,
+  CircleMarker,
+  MapContainer,
+  Popup,
+  TileLayer,
+  Tooltip,
+  useMap,
+} from "react-leaflet";
+
+import "leaflet/dist/leaflet.css";
+
 import Icon from "./Icon";
 
+// Localização inicial enquanto o GPS do usuário não responde
+const IRECE_POSITION = [-11.3033, -41.8553];
+
+// Coordenadas de exemplo.
+// Substitua pelos pontos cadastrados no seu backend.
 const nearbyStops = [
-  { id: 1, top: "29%", left: "24%", name: "Ponto União" },
-  { id: 2, top: "42%", left: "43%", name: "Ponto Avenida Central" },
-  { id: 3, top: "42%", left: "63%", name: "Ponto Faculdade" },
-  { id: 4, top: "74%", left: "67%", name: "Ponto Praça Sul" },
-  { id: 5, top: "83%", left: "35%", name: "Ponto Rua Principal" },
+  {
+    id: 1,
+    name: "Ponto União",
+    latitude: -11.2998,
+    longitude: -41.8589,
+    nextBus: "18:30",
+  },
+  {
+    id: 2,
+    name: "Ponto Avenida Central",
+    latitude: -11.3021,
+    longitude: -41.8547,
+    nextBus: "18:45",
+  },
+  {
+    id: 3,
+    name: "Ponto Faculdade",
+    latitude: -11.305,
+    longitude: -41.8518,
+    nextBus: "18:45",
+  },
+  {
+    id: 4,
+    name: "Ponto Praça Sul",
+    latitude: -11.308,
+    longitude: -41.8537,
+    nextBus: "18:45",
+  },
+  {
+    id: 5,
+    name: "Ponto Rua Principal",
+    latitude: -11.3065,
+    longitude: -41.859,
+    nextBus: "20:00",
+  },
 ];
 
-function BusStopMarker({ top, left, name }) {
+function MapController({ position, recenterRequest }) {
+  const map = useMap();
+
+  const initiallyCentered = useRef(false);
+  const lastRecenterRequest = useRef(0);
+
+  // Centraliza automaticamente quando encontra o usuário
+  useEffect(() => {
+    if (position && !initiallyCentered.current) {
+      map.flyTo(
+        [position.latitude, position.longitude],
+        16
+      );
+
+      initiallyCentered.current = true;
+    }
+  }, [map, position]);
+
+  // Centraliza quando o botão de localização é clicado
+  useEffect(() => {
+    if (
+      position &&
+      recenterRequest !== lastRecenterRequest.current
+    ) {
+      map.flyTo(
+        [position.latitude, position.longitude],
+        17
+      );
+
+      lastRecenterRequest.current = recenterRequest;
+    }
+  }, [map, position, recenterRequest]);
+
+  return null;
+}
+
+function BusStopMarker({
+  stop,
+  selected,
+  onSelect,
+}) {
   return (
-    <button
-      className="nearby-map-marker"
-      style={{ top, left }}
-      type="button"
-      aria-label={name}
+    <CircleMarker
+      center={[stop.latitude, stop.longitude]}
+      radius={15}
+      pathOptions={{
+        color: "#ffffff",
+        fillColor: selected ? "#f59e0b" : "#16a34a",
+        fillOpacity: 1,
+        weight: 3,
+      }}
+      eventHandlers={{
+        click: () => onSelect(stop),
+      }}
     >
-      <Icon name="bus" size={14} />
-    </button>
+      <Tooltip
+        direction="top"
+        offset={[0, -12]}
+      >
+        {stop.name}
+      </Tooltip>
+
+      <Popup>
+        <div className="stop-popup">
+          <strong>{stop.name}</strong>
+
+          <span>Ponto de embarque disponível</span>
+
+          <button
+            type="button"
+            onClick={() => onSelect(stop)}
+          >
+            Escolher este ponto
+          </button>
+        </div>
+      </Popup>
+    </CircleMarker>
   );
 }
 
-function NearbyMap() {
+function NearbyMap({ onSelectStop, onLocationChange }) {
+  const [position, setPosition] = useState(null);
+  const [selectedStop, setSelectedStop] = useState(null);
+  const [locationError, setLocationError] = useState("");
+  const [recenterRequest, setRecenterRequest] = useState(0);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationError(
+        "Seu navegador não oferece suporte à localização."
+      );
+
+      return undefined;
+    }
+
+    // Atualiza a localização enquanto o usuário se movimenta
+    const watchId = navigator.geolocation.watchPosition(
+      ({ coords }) => {
+        const currentPosition = {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          accuracy: coords.accuracy,
+        };
+
+        setPosition(currentPosition);
+
+        if (onLocationChange) {
+          onLocationChange(currentPosition);
+        }
+
+        setLocationError("");
+      },
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationError(
+            "Permita o acesso à sua localização."
+          );
+        } else if (
+          error.code === error.POSITION_UNAVAILABLE
+        ) {
+          setLocationError(
+            "Não foi possível encontrar sua localização."
+          );
+        } else {
+          setLocationError(
+            "A localização demorou para responder."
+          );
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 5000,
+      }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, []);
+
+  function handleSelectStop(stop) {
+    setSelectedStop(stop);
+
+    // Permite que a página-pai receba o ponto escolhido
+    if (onSelectStop) {
+      onSelectStop(stop);
+    }
+  }
+
+  function handleCenterLocation() {
+    if (position) {
+      setRecenterRequest((current) => current + 1);
+    }
+  }
+
   return (
     <section
       className="nearby-map"
       aria-label="Mapa dos pontos de ônibus próximos"
     >
-      <svg
-        className="nearby-map-background"
-        viewBox="0 0 430 330"
-        preserveAspectRatio="none"
-        aria-hidden="true"
+      <MapContainer
+        className="nearby-real-map"
+        center={IRECE_POSITION}
+        zoom={14}
+        zoomControl={false}
+        scrollWheelZoom
       >
-        <rect width="430" height="330" fill="#e8eeec" />
-
-        <path
-          className="map-green-area"
-          d="M0 0h92l35 76-53 44H0Z"
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <path
-          className="map-green-area"
-          d="m323 212 107-55v173H362l-48-61Z"
+        {nearbyStops.map((stop) => (
+          <BusStopMarker
+            key={stop.id}
+            stop={stop}
+            selected={selectedStop?.id === stop.id}
+            onSelect={handleSelectStop}
+          />
+        ))}
+
+        {position && (
+          <>
+            {/* Margem de precisão informada pelo GPS */}
+            <Circle
+              center={[
+                position.latitude,
+                position.longitude,
+              ]}
+              radius={position.accuracy}
+              pathOptions={{
+                color: "#2563eb",
+                fillColor: "#60a5fa",
+                fillOpacity: 0.12,
+                weight: 1,
+              }}
+            />
+
+            {/* Posição atual do usuário */}
+            <CircleMarker
+              center={[
+                position.latitude,
+                position.longitude,
+              ]}
+              radius={9}
+              pathOptions={{
+                color: "#ffffff",
+                fillColor: "#2563eb",
+                fillOpacity: 1,
+                weight: 4,
+              }}
+            >
+              <Tooltip
+                permanent
+                direction="top"
+                offset={[0, -10]}
+              >
+                Você está aqui
+              </Tooltip>
+
+              <Popup>
+                Sua localização atual
+                <br />
+                Precisão aproximada:{" "}
+                {Math.round(position.accuracy)} metros
+              </Popup>
+            </CircleMarker>
+          </>
+        )}
+
+        <MapController
+          position={position}
+          recenterRequest={recenterRequest}
         />
+      </MapContainer>
 
-        <path
-          className="map-green-area"
-          d="m0 235 75-30 62 125H0Z"
-        />
+      <div className="nearby-map-information">
+        {locationError ? (
+          <span className="location-error">
+            {locationError}
+          </span>
+        ) : selectedStop ? (
+          <>
+            <Icon name="bus" size={17} />
 
-        <g className="map-road">
-          <path d="M-10 119 442 120" />
-          <path d="M28 330 320-10" />
-          <path d="M89 330 380-8" />
-          <path d="M167 337 439 22" />
-          <path d="M-16 276 321 0" />
-          <path d="M-15 228 270 0" />
-          <path d="M73 329 430 111" />
-          <path d="M10 169 288 330" />
-          <path d="M70 80 400 286" />
-          <path d="M126 10 430 228" />
-          <path d="M175-10 430 165" />
-          <path d="M216-10 430 107" />
-        </g>
+            <span>
+              Selecionado: <strong>{selectedStop.name}</strong>
+            </span>
+          </>
+        ) : (
+          <>
+            <Icon name="location" size={17} />
 
-        <g className="map-road-thin">
-          <path d="M39 151 218 329" />
-          <path d="M93 92 355 329" />
-          <path d="M144 52 430 308" />
-          <path d="M21 296 302 25" />
-          <path d="M123 330 419 50" />
-        </g>
-      </svg>
-
-      <span className="map-region-label map-uniao">União</span>
-
-      <span className="map-street-label street-one">
-        Rua dos Ipês
-      </span>
-
-      <span className="map-street-label street-two">
-        Av. São João
-      </span>
-
-      <div className="map-campus">
-        <Icon name="graduation" size={17} />
-        <span>Faculdade</span>
-      </div>
-
-      {nearbyStops.map((stop) => (
-        <BusStopMarker
-          key={stop.id}
-          top={stop.top}
-          left={stop.left}
-          name={stop.name}
-        />
-      ))}
-
-      <div className="current-location">
-        <span className="current-location-pin">
-          <Icon name="pin" size={25} />
-        </span>
-
-        <strong>Praça da</strong>
-        <span>Prefeitura</span>
-      </div>
-
-      <div className="you-are-here">
-        <span className="you-dot" />
-        Você está aqui
+            <span>
+              Selecione um ponto de embarque
+            </span>
+          </>
+        )}
       </div>
 
       <button
         className="nearby-location-button"
         type="button"
         aria-label="Centralizar minha localização"
+        onClick={handleCenterLocation}
+        disabled={!position}
       >
         <Icon name="location" size={22} />
       </button>
