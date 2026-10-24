@@ -42,23 +42,25 @@ function BusSelection() {
   const [selectedBusId, setSelectedBusId] =
     useState(availableBuses[0].id);
 
-  const [confirmed, setConfirmed] = useState(false);
-
   const selectedBus = availableBuses.find(
     (bus) => bus.id === selectedBusId
   );
 
   function handleSelectBus(busId) {
-    setSelectedBusId(busId);
-    setConfirmed(false);
+  setSelectedBusId(busId);
+}
+
+function handleConfirmBus() {
+  if (!selectedBus) {
+    return;
   }
 
-  function handleConfirmBus() {
-    setConfirmed(true);
-
-    // Quando a próxima tela estiver pronta:
-    // navigate("/tracking");
-  }
+  navigate("/my-trip", {
+    state: {
+      selectedBus,
+    },
+  });
+}
 
   function handleNavigation(tab) {
     const routes = {
@@ -103,23 +105,12 @@ function BusSelection() {
         <SelectedBusCard bus={selectedBus} />
 
         <button
-          className={`choose-bus-button ${
-            confirmed ? "confirmed" : ""
-          }`}
+          className="choose-bus-button"
           type="button"
           onClick={handleConfirmBus}
         >
-          {confirmed ? (
-            <>
-              <Icon name="bus" size={20} />
-              Ônibus escolhido
-            </>
-          ) : (
-            <>
-              <Icon name="walk" size={20} />
-              Escolher ônibus
-            </>
-          )}
+          <Icon name="qr" size={20} />
+          Escolher ônibus
         </button>
       </div>
 

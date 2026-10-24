@@ -66,7 +66,7 @@ function NearbyPointCard({
 
   const navigate = useNavigate();
 
-function handleChoosePoint() {
+  function handleChoosePoint() {
     // Confirma o ponto na página anterior
     onConfirm(point);
 
