@@ -1,22 +1,197 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Circle,
+  CircleMarker,
+  MapContainer,
+  Popup,
+  TileLayer,
+  useMap,
+} from "react-leaflet";
+
+import "leaflet/dist/leaflet.css";
+
 import Icon from "./Icon";
 
-function MapButton({ icon, label, notification = false }) {
+const IRECE_POSITION = [-11.3033, -41.8553];
+
+function MapButton({
+  icon,
+  label,
+  notification = false,
+  onClick,
+}) {
   return (
-    <button className="map-button" type="button" aria-label={label}>
+    <button
+      className="map-button"
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+    >
       <Icon name={icon} />
 
       {notification && (
-        <span className="notification-dot" aria-hidden="true" />
+        <span
+          className="notification-dot"
+          aria-hidden="true"
+        />
       )}
     </button>
   );
 }
 
+/*
+ * Controla a câmera do mapa.
+ * Na primeira localização encontrada, o mapa vai até o usuário.
+ * Depois, ele só centraliza novamente quando o botão for clicado.
+ */
+function MapController({ position, recenterRequest }) {
+  const map = useMap();
+  const initiallyCentered = useRef(false);
+  const lastRequest = useRef(0);
+
+  useEffect(() => {
+    if (position && !initiallyCentered.current) {
+      map.flyTo([position.latitude, position.longitude], 17);
+      initiallyCentered.current = true;
+    }
+  }, [map, position]);
+
+  useEffect(() => {
+    if (
+      position &&
+      recenterRequest !== lastRequest.current
+    ) {
+      map.flyTo([position.latitude, position.longitude], 17);
+      lastRequest.current = recenterRequest;
+    }
+  }, [map, position, recenterRequest]);
+
+  return null;
+}
+
 function MapSection() {
+  const [position, setPosition] = useState(null);
+  const [locationError, setLocationError] = useState("");
+  const [recenterRequest, setRecenterRequest] = useState(0);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationError(
+        "A localização não é suportada neste dispositivo."
+      );
+      return undefined;
+    }
+
+    /*
+     * watchPosition acompanha a posição enquanto o usuário
+     * estiver se movimentando.
+     */
+    const watchId = navigator.geolocation.watchPosition(
+      ({ coords }) => {
+        setPosition({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          accuracy: coords.accuracy,
+        });
+
+        setLocationError("");
+      },
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationError(
+            "Permita o acesso à localização para aparecer no mapa."
+          );
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          setLocationError(
+            "Não foi possível determinar sua localização."
+          );
+        } else {
+          setLocationError(
+            "A localização demorou muito para responder."
+          );
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 5000,
+      }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, []);
+
+  const handleCenterLocation = () => {
+    if (position) {
+      setRecenterRequest((current) => current + 1);
+    }
+  };
+
   return (
-    <section className="map-section" aria-label="Localização do ônibus">
-      <div className="map-background" aria-hidden="true" />
+    <section
+      className="map-section"
+      aria-label="Localização do usuário"
+    >
+      <MapContainer
+        className="real-map"
+        center={IRECE_POSITION}
+        zoom={14}
+        zoomControl={false}
+        scrollWheelZoom
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {position && (
+          <>
+            {/* Área aproximada de precisão do GPS */}
+            <Circle
+              center={[
+                position.latitude,
+                position.longitude,
+              ]}
+              radius={position.accuracy}
+              pathOptions={{
+                color: "#2563eb",
+                fillColor: "#60a5fa",
+                fillOpacity: 0.12,
+                weight: 1,
+              }}
+            />
+
+            {/* Marcador da posição do usuário */}
+            <CircleMarker
+              center={[
+                position.latitude,
+                position.longitude,
+              ]}
+              radius={9}
+              pathOptions={{
+                color: "#ffffff",
+                fillColor: "#2563eb",
+                fillOpacity: 1,
+                weight: 4,
+              }}
+            >
+              <Popup>
+                <strong>Você está aqui</strong>
+                <br />
+                Precisão aproximada:{" "}
+                {Math.round(position.accuracy)} metros
+              </Popup>
+            </CircleMarker>
+          </>
+        )}
+
+        <MapController
+          position={position}
+          recenterRequest={recenterRequest}
+        />
+      </MapContainer>
 
       <header className="map-header">
         <div className="brand">
@@ -30,7 +205,10 @@ function MapSection() {
         </div>
 
         <div className="map-actions">
-          <MapButton icon="qr" label="Abrir leitor de QR Code" />
+          <MapButton
+            icon="qr"
+            label="Abrir leitor de QR Code"
+          />
 
           <MapButton
             icon="bell"
@@ -40,67 +218,30 @@ function MapSection() {
         </div>
       </header>
 
-      <svg
-        className="route-map"
-        viewBox="0 0 430 380"
-        role="img"
-        aria-label="Rota entre a praça e a faculdade"
+      <div
+        className={
+          locationError
+            ? "map-status map-status-error"
+            : "map-status"
+        }
       >
-        <path className="street" d="M-20 65 460 290" />
-        <path className="street" d="M50-20 390 400" />
-        <path className="street" d="M-20 300 440 72" />
-        <path className="street" d="M0 180 430 340" />
-
-        <polyline
-          className="route-shadow"
-          points="97,292 180,285 225,265 245,220 270,226 285,186 269,152 275,112 250,93 258,55"
+        <Icon
+          name={locationError ? "location" : "bus"}
+          size={16}
         />
 
-        <polyline
-          className="route-line"
-          points="97,292 180,285 225,265 245,220 270,226 285,186 269,152 275,112 250,93 258,55"
-        />
-
-        <circle className="route-point" cx="97" cy="292" r="7" />
-        <circle className="route-point" cx="258" cy="55" r="7" />
-
-        <text className="map-label" x="67" y="250">
-          Praça da
-        </text>
-
-        <text className="map-label" x="67" y="268">
-          Prefeitura
-        </text>
-
-        <text className="map-label" x="225" y="30">
-          Faculdade
-        </text>
-
-        <g transform="translate(278 185)">
-          <circle className="bus-halo" r="27" />
-          <circle className="bus-marker" r="19" />
-
-          <g className="map-bus-icon" transform="translate(-10 -10) scale(.84)">
-            <rect x="5" y="3" width="14" height="17" rx="3" />
-            <path d="M5 9h14M8 16h.01M16 16h.01M7 20v2M17 20v2" />
-          </g>
-        </g>
-
-        <g transform="translate(195 329)">
-          <circle className="user-halo" r="22" />
-          <circle className="user-position" r="9" />
-        </g>
-      </svg>
-
-      <div className="map-status">
-        <Icon name="bus" size={16} />
-        Ônibus a caminho
+        {locationError ||
+          (position
+            ? "Sua localização foi encontrada"
+            : "Procurando sua localização...")}
       </div>
 
       <button
         className="location-button"
         type="button"
         aria-label="Centralizar minha localização"
+        onClick={handleCenterLocation}
+        disabled={!position}
       >
         <Icon name="location" size={25} />
       </button>

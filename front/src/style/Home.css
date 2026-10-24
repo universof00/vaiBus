@@ -7,6 +7,8 @@
   --success-dark: #076040;
   --border: #dde5f0;
   --background: #f7faff;
+
+  --bus-primary: #0875e1;
 }
 
 * {
@@ -54,214 +56,101 @@ button {
 
 .map-section {
   position: relative;
-  height: clamp(350px, 42vh, 430px);
+  width: 100%;
+  height: 380px;
   overflow: hidden;
-  background: #edf3f9;
+  background-color: #e5e7eb;
 }
 
-.map-background {
-  position: absolute;
-  inset: -60px;
-  opacity: 0.86;
-  transform: rotate(-3deg) scale(1.1);
-  background:
-    linear-gradient(
-      29deg,
-      transparent 0 20%,
-      #fff 20% 22%,
-      transparent 22% 51%,
-      #fff 51% 54%,
-      transparent 54%
-    ),
-    linear-gradient(
-      105deg,
-      transparent 0 24%,
-      #fff 24% 27%,
-      transparent 27% 56%,
-      #fff 56% 59%,
-      transparent 59%
-    ),
-    linear-gradient(
-      8deg,
-      transparent 0 35%,
-      #fff 35% 38%,
-      transparent 38% 73%,
-      #fff 73% 76%,
-      transparent 76%
-    ),
-    linear-gradient(
-      145deg,
-      transparent 0 44%,
-      #dff2de 44% 55%,
-      transparent 55% 82%,
-      #e6f4e1 82% 91%,
-      transparent 91%
-    );
-}
-
-.map-header {
-  position: absolute;
-  z-index: 3;
-  top: max(18px, env(safe-area-inset-top));
-  left: 18px;
-  right: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 51px;
-  padding: 7px 15px 7px 8px;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 7px 18px rgba(28, 60, 112, 0.15);
-}
-
-.brand-icon {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  color: #fff;
-  background: var(--primary);
-}
-
-.brand-name {
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -1px;
-}
-
-.brand-name span {
-  color: var(--primary);
-}
-
-.map-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.map-button,
-.location-button {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  color: var(--primary-dark);
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 7px 18px rgba(28, 60, 112, 0.15);
-  cursor: pointer;
-}
-
-.map-button {
-  position: relative;
-}
-
-.notification-dot {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 11px;
-  height: 11px;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  background: #e8423f;
-}
-
-.route-map {
+.real-map {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 1;
 }
 
-.street {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 13;
+.map-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 20px;
+
+  /* Melhora a leitura sobre o mapa */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0)
+  );
+
+  pointer-events: none;
 }
 
-.route-shadow {
-  fill: none;
-  stroke: rgba(10, 66, 153, 0.15);
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.route-line {
-  fill: none;
-  stroke: var(--primary);
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.route-point {
-  fill: var(--primary);
-  stroke: #fff;
-  stroke-width: 3;
-}
-
-.map-label {
-  fill: #40577a;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.bus-halo,
-.user-halo {
-  fill: rgba(8, 100, 247, 0.16);
-}
-
-.bus-marker {
-  fill: var(--primary);
-  stroke: #fff;
-  stroke-width: 3;
-}
-
-.map-bus-icon {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.user-position {
-  fill: var(--primary);
-  stroke: #fff;
-  stroke-width: 3;
+.map-header button {
+  pointer-events: auto;
 }
 
 .map-status {
   position: absolute;
-  z-index: 2;
-  top: 47%;
-  right: 6%;
+  left: 50%;
+  bottom: 20px;
+  z-index: 1000;
+  transform: translateX(-50%);
+
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 11px;
-  border-radius: 18px;
-  color: var(--success-dark);
-  background: var(--success-light);
-  font-size: 13px;
-  font-weight: 700;
+  gap: 8px;
+
+  padding: 10px 16px;
+  border-radius: 20px;
+  background-color: #ffffff;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.map-status-error {
+  color: #b42318;
 }
 
 .location-button {
   position: absolute;
-  right: 20px;
-  bottom: 27px;
+  right: 18px;
+  bottom: 20px;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+
+  background-color: #ffffff;
+  color: #2563eb;
+  cursor: pointer;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.location-button:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.leaflet-control-attribution {
+  font-size: 9px;
 }
 
 /* Conteúdo */
@@ -551,37 +440,25 @@ button {
   background: #e8fff5;
 }
 
-/* Último ponto */
+/* Btn principal */
 
-.recent-stop {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 11px;
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px 13px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  text-align: left;
-  background: #fff;
-  cursor: pointer;
-}
-
-.recent-stop-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.recent-stop-text small {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.recent-stop-text strong {
-  margin-top: 1px;
-  font-size: 15px;
-}
+.choose-point-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    width: 100%;
+    min-height: 41px;
+    margin-top: 12px;
+    padding: 9px 16px;
+    border: 1px solid var(--bus-primary);
+    border-radius: 8px;
+    color: #fff;
+    background: var(--bus-primary);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
 
 /* Navegação inferior */
 
