@@ -19,7 +19,7 @@ function SelectedBusCard({ bus }) {
         </span>
 
         <div>
-          <strong>{bus.name}</strong>
+          <strong>{bus.name} - {bus.placa}</strong>
 
           <p>
             Chegada prevista:

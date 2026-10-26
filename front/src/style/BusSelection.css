@@ -101,13 +101,12 @@
 .bus-table-header {
   display: grid;
   grid-template-columns:
-    minmax(112px, 1.5fr)
-    minmax(54px, 0.8fr)
-    46px
-    minmax(73px, 1fr);
+    minmax(130px, 1.5fr)
+    60px
+    minmax(90px, 1fr);
   align-items: center;
   min-height: 33px;
-  padding: 0 7px;
+  padding: 0 7px 0 25px;
   color: #607592;
   font-size: 9px;
   text-align: center;
@@ -123,10 +122,9 @@
   display: grid;
   grid-template-columns:
     18px
-    minmax(94px, 1.5fr)
-    minmax(54px, 0.8fr)
-    46px
-    minmax(73px, 1fr);
+    minmax(110px, 1.5fr)
+    60px
+    minmax(90px, 1fr);
   align-items: center;
   min-height: 45px;
   padding: 0 7px;
@@ -243,6 +241,7 @@
 .bus-status-moving .bus-status-dot {
   background: #6c91ba;
 }
+
 
 /* Card da escolha */
 

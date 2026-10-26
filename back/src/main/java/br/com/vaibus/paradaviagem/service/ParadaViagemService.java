@@ -9,6 +9,8 @@ import br.com.vaibus.viagem.repository.ViagemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ParadaViagemService implements ParadaViagemIService {
@@ -53,5 +55,13 @@ public class ParadaViagemService implements ParadaViagemIService {
         paradaViagem.setPontoEmbarque(pontoEmbarque);
 
         paradaViagemRepository.save(paradaViagem);
+    }
+
+    @Override
+    public List<ParadaViagem> buscarPorPontoEmbarque(
+            Long pontoEmbarqueId
+    ) {
+        return paradaViagemRepository
+                .findByPontoEmbarque_Id(pontoEmbarqueId);
     }
 }

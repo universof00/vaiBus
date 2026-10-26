@@ -15,46 +15,7 @@ import Icon from "./Icon";
 
 // Localização inicial enquanto o GPS do usuário não responde
 const IRECE_POSITION = [-11.3033, -41.8553];
-
-// Coordenadas de exemplo.
-// Substitua pelos pontos cadastrados no seu backend.
-const nearbyStops = [
-  {
-    id: 1,
-    name: "Ponto União",
-    latitude: -11.2998,
-    longitude: -41.8589,
-    nextBus: "18:30",
-  },
-  {
-    id: 2,
-    name: "Ponto Avenida Central",
-    latitude: -11.3021,
-    longitude: -41.8547,
-    nextBus: "18:45",
-  },
-  {
-    id: 3,
-    name: "Ponto Faculdade",
-    latitude: -11.305,
-    longitude: -41.8518,
-    nextBus: "18:45",
-  },
-  {
-    id: 4,
-    name: "Ponto Praça Sul",
-    latitude: -11.308,
-    longitude: -41.8537,
-    nextBus: "18:45",
-  },
-  {
-    id: 5,
-    name: "Ponto Rua Principal",
-    latitude: -11.3065,
-    longitude: -41.859,
-    nextBus: "20:00",
-  },
-];
+const API_URL = "http://localhost:8080";
 
 function MapController({ position, recenterRequest }) {
   const map = useMap();
@@ -142,6 +103,11 @@ function NearbyMap({ onSelectStop, onLocationChange }) {
   const [locationError, setLocationError] = useState("");
   const [recenterRequest, setRecenterRequest] = useState(0);
 
+  // Estado para armazenar os pontos de ônibus próximos
+  const [nearbyStops, setNearbyStops] = useState([]);
+  const [stopsError, setStopsError] = useState("");
+  const [loadingStops, setLoadingStops] = useState(true);
+
   useEffect(() => {
     if (!navigator.geolocation) {
       setLocationError(
@@ -195,6 +161,44 @@ function NearbyMap({ onSelectStop, onLocationChange }) {
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
+  }, []);
+
+  useEffect(() => {
+    async function loadStops() {
+      try {
+        setLoadingStops(true);
+        setStopsError("");
+
+        const response = await fetch(
+          `${API_URL}/pontos-embarque`
+        );
+
+        if (!response.ok) {
+          throw new Error("Não foi possível carregar os pontos.");
+        }
+
+        const data = await response.json();
+
+        // Ajusta os nomes vindos do backend
+        // para o padrão usado no mapa.
+        const formattedStops = data.map((stop) => ({
+          id: stop.id,
+          name: stop.nome,
+          latitude: stop.latitude,
+          longitude: stop.longitude,
+        }));
+
+        setNearbyStops(formattedStops);
+      } catch (error) {
+        setStopsError(
+          "Não foi possível carregar os pontos de embarque."
+        );
+      } finally {
+        setLoadingStops(false);
+      }
+    }
+
+    loadStops();
   }, []);
 
   function handleSelectStop(stop) {
@@ -294,10 +298,12 @@ function NearbyMap({ onSelectStop, onLocationChange }) {
       </MapContainer>
 
       <div className="nearby-map-information">
-        {locationError ? (
-          <span className="location-error">
-            {locationError}
-          </span>
+        {loadingStops ? (
+          <span>Carregando pontos...</span>
+        ) : stopsError ? (
+          <span className="location-error">{stopsError}</span>
+        ) : locationError ? (
+          <span className="location-error">{locationError}</span>
         ) : selectedStop ? (
           <>
             <Icon name="bus" size={17} />
@@ -310,9 +316,7 @@ function NearbyMap({ onSelectStop, onLocationChange }) {
           <>
             <Icon name="location" size={17} />
 
-            <span>
-              Selecione um ponto de embarque
-            </span>
+            <span>Selecione um ponto de embarque</span>
           </>
         )}
       </div>

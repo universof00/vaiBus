@@ -22,7 +22,6 @@ function BusList({ buses, selectedBusId, onSelect }) {
 
       <div className="bus-table-header" aria-hidden="true">
         <span>Ônibus</span>
-        <span>Destino</span>
         <span>Chegada</span>
         <span>Situação</span>
       </div>
@@ -54,10 +53,6 @@ function BusList({ buses, selectedBusId, onSelect }) {
                 </span>
 
                 <strong>{bus.name}</strong>
-              </span>
-
-              <span className="bus-destination">
-                {bus.destination}
               </span>
 
               <span className="bus-arrival">

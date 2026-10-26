@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import ScreenHeader from "../components/ScreenHeader";
 import BusList from "../components/BusList";
@@ -9,58 +9,90 @@ import Icon from "../components/Icon";
 
 import "../style/BusSelection.css";
 
-const availableBuses = [
-  {
-    id: 1,
-    name: "Ônibus 01",
-    destination: "Faculdade",
-    arrival: "18:10",
-    status: "No horário",
-    statusType: "on-time",
-  },
-  {
-    id: 3,
-    name: "Ônibus 03",
-    destination: "Faculdade",
-    arrival: "18:25",
-    status: "5 min atrasado",
-    statusType: "delayed",
-  },
-  {
-    id: 7,
-    name: "Ônibus 07",
-    destination: "Centro",
-    arrival: "18:42",
-    status: "A caminho",
-    statusType: "moving",
-  },
-];
+const API_URL = "http://localhost:8080";
 
 function BusSelection() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [selectedBusId, setSelectedBusId] =
-    useState(availableBuses[0].id);
+  const selectedPoint = location.state?.selectedPoint;
+
+  const [availableBuses, setAvailableBuses] = useState([]);
+  const [selectedBusId, setSelectedBusId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function loadBuses() {
+      if (!selectedPoint) {
+        setError("Escolha um ponto de embarque antes.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError("");
+
+        // Ajuste esta URL caso a sua rota tenha outro nome.
+        const response = await fetch(
+          `${API_URL}/pontos-embarque/${selectedPoint.id}/onibus`
+        );
+
+        if (!response.ok) {
+          throw new Error("Não foi possível buscar os ônibus.");
+        }
+
+        const data = await response.json();
+
+        const formattedBuses = data.map((bus) => ({
+          id: bus.id,
+          name: bus.identificacao,
+          destination: "Destino será informado",
+          arrival: "Horário não informado",
+          status: "Disponível",
+          statusType: "on-time",
+          placa: bus.placa,
+          codigoQr: bus.codigoQr,
+        }));
+
+        setAvailableBuses(formattedBuses);
+
+        if (formattedBuses.length > 0) {
+          setSelectedBusId(formattedBuses[0].id);
+        }
+      } catch (error) {
+        setError(
+          "Não foi possível carregar os ônibus deste ponto."
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadBuses();
+  }, [selectedPoint]);
 
   const selectedBus = availableBuses.find(
     (bus) => bus.id === selectedBusId
   );
 
   function handleSelectBus(busId) {
-  setSelectedBusId(busId);
-}
-
-function handleConfirmBus() {
-  if (!selectedBus) {
-    return;
+    setSelectedBusId(busId);
   }
 
-  navigate("/my-trip", {
-    state: {
-      selectedBus,
-    },
-  });
-}
+  function handleConfirmBus() {
+    if (!selectedBus) {
+      return;
+    }
+
+    navigate("/my-trip", {
+      state: {
+        selectedBus,
+        selectedPoint,
+      },
+    });
+  }
 
   function handleNavigation(tab) {
     const routes = {
@@ -87,8 +119,11 @@ function handleConfirmBus() {
       <section className="bus-greeting">
         <div>
           <h2>Boa noite, Lucke</h2>
+
           <p>
-            Escolha o ônibus que deseja utilizar hoje.
+            {selectedPoint
+              ? `Escolha um ônibus para ${selectedPoint.name}.`
+              : "Escolha o ônibus que deseja utilizar hoje."}
           </p>
         </div>
 
@@ -96,22 +131,34 @@ function handleConfirmBus() {
       </section>
 
       <div className="bus-selection-content">
-        <BusList
-          buses={availableBuses}
-          selectedBusId={selectedBusId}
-          onSelect={handleSelectBus}
-        />
+        {loading ? (
+          <p>Carregando ônibus disponíveis...</p>
+        ) : error ? (
+          <p className="bus-error">{error}</p>
+        ) : availableBuses.length === 0 ? (
+          <p>
+            Não existem ônibus disponíveis para este ponto.
+          </p>
+        ) : (
+          <>
+            <BusList
+              buses={availableBuses}
+              selectedBusId={selectedBusId}
+              onSelect={handleSelectBus}
+            />
 
-        <SelectedBusCard bus={selectedBus} />
+            <SelectedBusCard bus={selectedBus} />
 
-        <button
-          className="choose-bus-button"
-          type="button"
-          onClick={handleConfirmBus}
-        >
-          <Icon name="qr" size={20} />
-          Escolher ônibus
-        </button>
+            <button
+              className="choose-bus-button"
+              type="button"
+              onClick={handleConfirmBus}
+            >
+              <Icon name="qr" size={20} />
+              Escolher ônibus
+            </button>
+          </>
+        )}
       </div>
 
       <div className="bus-page-space" />
