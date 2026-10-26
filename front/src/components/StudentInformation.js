@@ -11,12 +11,6 @@ function StudentInformation({ student }) {
       <div className="student-details">
         <h2>{student.name}</h2>
 
-        <p>{student.course}</p>
-
-        <span className="presence-confirmed">
-          <Icon name="checkCircle" size={14} />
-          Presença confirmada
-        </span>
       </div>
     </section>
   );

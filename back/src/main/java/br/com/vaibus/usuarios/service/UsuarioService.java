@@ -47,4 +47,11 @@ public class UsuarioService implements UsuarioIService {
 
         usuarioRepository.save(usuario);
     }
+
+    @Override
+    public Usuario login(String email, String senha) {
+        return usuarioRepository
+                .findByEmailAndSenha(email, senha)
+                .orElse(null);
+    }
 }

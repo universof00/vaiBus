@@ -7,17 +7,47 @@ import {
 import ScreenHeader from "../components/ScreenHeader";
 import StudentInformation from "../components/StudentInformation";
 import TripQrScanner from "../components/TripQrScanner";
-import BoardingProgress from "../components/BoardingProgress";
 import BottomNavigation from "../components/BottomNavigation";
 import Icon from "../components/Icon";
 
 import "../style/MyTrip.css";
 
-const student = {
-  id: 15,
-  name: "Lucas Almeida",
-  course: "Ciência da Computação",
-};
+function getStoredStudent() {
+  try {
+    const storedUser =
+      localStorage.getItem("vaibus_user");
+
+    if (!storedUser) {
+      return {
+        id: null,
+        name: "Usuário",
+        email: "",
+        type: "",
+      };
+    }
+
+    const user = JSON.parse(storedUser);
+
+    return {
+      id: user.id ?? null,
+      name: user.nome ?? "Usuário",
+      email: user.email ?? "",
+      type: user.tipo ?? "",
+    };
+  } catch (error) {
+    console.error(
+      "Erro ao recuperar usuário:",
+      error
+    );
+
+    return {
+      id: null,
+      name: "Usuário",
+      email: "",
+      type: "",
+    };
+  }
+}
 
 function MyTrip() {
   const navigate = useNavigate();
@@ -25,10 +55,13 @@ function MyTrip() {
 
   const selectedBus = location.state?.selectedBus;
 
+  const [student] = useState(getStoredStudent);
+
   const [boardingConfirmed, setBoardingConfirmed] =
     useState(false);
 
-  const [scanMessage, setScanMessage] = useState("");
+  const [scanMessage, setScanMessage] =
+    useState("");
 
   function handleQrCodeScanned(decodedText) {
     if (!selectedBus) {
@@ -38,11 +71,6 @@ function MyTrip() {
       return;
     }
 
-    /*
-     * Exemplo:
-     * o QR Code do ônibus 1 deve conter:
-     * vaibus:bus:1
-     */
     const expectedQrCode =
       `vaibus:bus:${selectedBus.id}`;
 
@@ -50,35 +78,33 @@ function MyTrip() {
       setScanMessage(
         `Este QR Code não pertence ao ${selectedBus.name}.`
       );
-
       return;
     }
 
     setBoardingConfirmed(true);
+
     setScanMessage(
       `Presença confirmada no ${selectedBus.name}.`
     );
 
     /*
-     * Futuramente, envie a confirmação ao backend:
-     *
-     * fetch("/embarques/confirmar", {
-     *   method: "POST",
-     *   headers: {
-     *     "Content-Type": "application/json",
-     *   },
-     *   body: JSON.stringify({
-     *     studentId: student.id,
-     *     busId: selectedBus.id,
-     *     qrCode: decodedText,
-     *   }),
-     * });
-     */
+    fetch("http://localhost:8080/embarques/confirmar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        studentId: student.id,
+        busId: selectedBus.id,
+        qrCode: decodedText,
+      }),
+    });
+    */
   }
 
   function handleNavigation(tab) {
     const routes = {
-      inicio: "/",
+      inicio: "/home",
       mapa: "/nearby",
       viagens: "/my-trip",
       perfil: "/profile",
@@ -136,12 +162,6 @@ function MyTrip() {
 
           <div>
             <h2>{selectedBus.name}</h2>
-            <p>
-              Destino: {selectedBus.destination}
-            </p>
-            <p>
-              Previsão: {selectedBus.arrival}
-            </p>
           </div>
         </article>
 
@@ -163,6 +183,7 @@ function MyTrip() {
             {scanMessage && (
               <div className="scan-result scan-error">
                 <Icon name="warning" size={20} />
+
                 {scanMessage}
               </div>
             )}
@@ -179,11 +200,6 @@ function MyTrip() {
         )}
 
         <div className="trip-divider" />
-
-        <BoardingProgress
-          boarded={boardingConfirmed ? 19 : 18}
-          total={20}
-        />
       </section>
 
       <div className="my-trip-empty-space" />

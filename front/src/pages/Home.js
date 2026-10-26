@@ -20,7 +20,7 @@ function Home() {
         <span className="drag-handle" aria-hidden="true" />
 
         <div className="welcome">
-          <h1>Boa noite, Lucas</h1>
+          <h1>Boa noite, {localStorage.getItem("vaibus_user") ? JSON.parse(localStorage.getItem("vaibus_user")).nome : "usuário"}</h1>
           <p>Pronto para sua próxima viagem?</p>
         </div>
 

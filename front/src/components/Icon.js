@@ -124,6 +124,51 @@ checkCircle: (
   </>
 ),
 
+lock: (
+  <>
+    <rect x="5" y="10" width="14" height="11" rx="2" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+  </>
+),
+
+eye: (
+  <>
+    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+    <circle cx="12" cy="12" r="3" />
+  </>
+),
+
+eyeOff: (
+  <>
+    <path d="m3 3 18 18" />
+    <path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.8" />
+    <path d="M6.6 6.6C3.6 8.2 2 12 2 12s3.5 6 10 6a10 10 0 0 0 4.1-.8" />
+  </>
+),
+
+steeringWheel: (
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="2" />
+    <path d="M3.5 10h6.5M14 10h6.5M12 14v7" />
+    <path d="m10.5 10-4-4M13.5 10l4-4" />
+  </>
+),
+
+userPlus: (
+  <>
+    <circle cx="9" cy="8" r="4" />
+    <path d="M2 21a7 7 0 0 1 14 0M19 8v6M16 11h6" />
+  </>
+),
+
+shieldCheck: (
+  <>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+    <path d="m9 12 2 2 4-4" />
+  </>
+),
+
 };
 
 function Icon({ name, size = 24, className = "" }) {

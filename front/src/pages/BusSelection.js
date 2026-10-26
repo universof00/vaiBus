@@ -118,7 +118,7 @@ function BusSelection() {
 
       <section className="bus-greeting">
         <div>
-          <h2>Boa noite, Lucke</h2>
+          <h2>{localStorage.getItem("vaibus_user") ? JSON.parse(localStorage.getItem("vaibus_user")).nome : "usuário"}</h2>
 
           <p>
             {selectedPoint
