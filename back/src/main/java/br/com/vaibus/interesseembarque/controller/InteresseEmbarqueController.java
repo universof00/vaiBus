@@ -6,11 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -28,5 +24,28 @@ public class InteresseEmbarqueController {
     public ResponseEntity<?> save(@RequestBody InteresseEmbarque interesseEmbarque) {
         interesseEmbarqueService.save(interesseEmbarque);
         return ResponseEntity.status(HttpStatus.CREATED).body(interesseEmbarque);
+    }
+
+    @PostMapping("/registrar")
+    public ResponseEntity<String> registrar(
+            @RequestParam String email,
+            @RequestParam Long pontoEmbarqueId,
+            @RequestParam Long onibusId
+    ) {
+        try {
+            interesseEmbarqueService.registrar(
+                    email,
+                    pontoEmbarqueId,
+                    onibusId
+            );
+
+            return ResponseEntity.ok(
+                    "Interesse de embarque registrado."
+            );
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(error.getMessage());
+        }
     }
 }

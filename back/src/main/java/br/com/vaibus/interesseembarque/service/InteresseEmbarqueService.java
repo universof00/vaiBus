@@ -56,4 +56,50 @@ public class InteresseEmbarqueService implements InteresseEmbarqueIService {
 
         interesseEmbarqueRepository.save(interesseEmbarque);
     }
+
+    @Override
+    public InteresseEmbarque registrar(
+            String email,
+            Long pontoEmbarqueId,
+            Long onibusId
+    ) {
+        Usuario usuario = usuarioRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Usuário não encontrado."
+                        )
+                );
+
+        ParadaViagem paradaViagem = paradaViagemRepository
+                .findFirstByPontoEmbarqueIdAndViagemOnibusId(
+                        pontoEmbarqueId,
+                        onibusId
+                )
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Esse ônibus não passa pelo ponto escolhido."
+                        )
+                );
+
+        boolean jaRegistrado = interesseEmbarqueRepository
+                .existsByAluno_IdAndParadaViagem_Id(
+                        usuario.getId(),
+                        paradaViagem.getId()
+                );
+
+        if (jaRegistrado) {
+            throw new IllegalArgumentException(
+                    "Você já registrou interesse neste embarque."
+            );
+        }
+
+        InteresseEmbarque interesse =
+                new InteresseEmbarque();
+
+        interesse.setAluno(usuario);
+        interesse.setParadaViagem(paradaViagem);
+
+        return interesseEmbarqueRepository.save(interesse);
+    }
 }

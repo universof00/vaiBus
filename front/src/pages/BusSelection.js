@@ -81,9 +81,48 @@ function BusSelection() {
     setSelectedBusId(busId);
   }
 
-  function handleConfirmBus() {
-    if (!selectedBus) {
-      return;
+  async function handleConfirmBus() {
+  if (!selectedBus || !selectedPoint) {
+    return;
+  }
+
+  const email =
+    localStorage.getItem("vaibus_user_email") ||
+    sessionStorage.getItem("vaibus_user_email");
+
+  if (!email) {
+    navigate("/login");
+    return;
+  }
+
+  try {
+    const formData = new URLSearchParams();
+
+    formData.append("email", email);
+    formData.append(
+      "pontoEmbarqueId",
+      selectedPoint.id
+    );
+    formData.append("onibusId", selectedBus.id);
+
+    const response = await fetch(
+      "http://localhost:8080/interesses-embarque/registrar",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded",
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const message = await response.text();
+
+      throw new Error(
+        message || "Não foi possível registrar o interesse."
+      );
     }
 
     navigate("/my-trip", {
@@ -92,7 +131,10 @@ function BusSelection() {
         selectedPoint,
       },
     });
+  } catch (error) {
+    setError(error.message);
   }
+}
 
   function handleNavigation(tab) {
     const routes = {
