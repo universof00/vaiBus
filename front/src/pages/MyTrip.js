@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, {
+  useRef,
+  useState,
+} from "react";
+
 import {
   useLocation,
   useNavigate,
@@ -12,10 +16,13 @@ import Icon from "../components/Icon";
 
 import "../style/MyTrip.css";
 
+const API_URL = "http://localhost:8080";
+
 function getStoredStudent() {
   try {
     const storedUser =
-      localStorage.getItem("vaibus_user");
+      localStorage.getItem("vaibus_user") ||
+      sessionStorage.getItem("vaibus_user");
 
     if (!storedUser) {
       return {
@@ -63,7 +70,13 @@ function MyTrip() {
   const [scanMessage, setScanMessage] =
     useState("");
 
-  function handleQrCodeScanned(decodedText) {
+  const scanInProgress = useRef(false);
+
+  async function handleQrCodeScanned(decodedText) {
+    if (scanInProgress.current) {
+      return;
+    }
+
     if (!selectedBus) {
       setScanMessage(
         "Nenhum ônibus foi selecionado."
@@ -71,35 +84,84 @@ function MyTrip() {
       return;
     }
 
-    const expectedQrCode =
-      `vaibus:bus:${selectedBus.id}`;
+    if (!student.id) {
+      setScanMessage(
+        "Não foi possível identificar o aluno. Entre novamente no sistema."
+      );
+      return;
+    }
 
-    if (decodedText !== expectedQrCode) {
+    const expectedQrCode = selectedBus.codigoQr;
+
+    if (!expectedQrCode) {
+      setScanMessage(
+        "O ônibus selecionado não possui QR Code cadastrado."
+      );
+      return;
+    }
+
+    console.log("codigo do onibus: " + expectedQrCode);
+    console.log("codigo escaneado: " + decodedText);
+
+    const scannedCode = decodedText.trim();
+    const busCode = expectedQrCode.trim();
+
+    if (scannedCode !== busCode) {
       setScanMessage(
         `Este QR Code não pertence ao ${selectedBus.name}.`
       );
       return;
     }
 
-    setBoardingConfirmed(true);
+    scanInProgress.current = true;
 
-    setScanMessage(
-      `Presença confirmada no ${selectedBus.name}.`
-    );
+    try {
+      setScanMessage(
+        "Confirmando embarque..."
+      );
 
-    /*
-    fetch("http://localhost:8080/embarques/confirmar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        studentId: student.id,
-        busId: selectedBus.id,
-        qrCode: decodedText,
-      }),
-    });
-    */
+      const formData = new URLSearchParams();
+
+      formData.append(
+        "usuarioId",
+        student.id
+      );
+
+      formData.append(
+        "onibusId",
+        selectedBus.id
+      );
+
+      const response = await fetch(
+        `${API_URL}/interesses-embarque/confirmar-embarque`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const message = await response.text();
+
+        throw new Error(
+          message ||
+            "Não foi possível confirmar o embarque."
+        );
+      }
+
+      setBoardingConfirmed(true);
+
+      setScanMessage(
+        `Presença confirmada no ${selectedBus.name}.`
+      );
+    } catch (error) {
+      scanInProgress.current = false;
+      setScanMessage(error.message);
+    }
   }
 
   function handleNavigation(tab) {
@@ -162,6 +224,7 @@ function MyTrip() {
 
           <div>
             <h2>{selectedBus.name}</h2>
+            <p>{selectedBus.placa}</p>
           </div>
         </article>
 
@@ -183,7 +246,6 @@ function MyTrip() {
             {scanMessage && (
               <div className="scan-result scan-error">
                 <Icon name="warning" size={20} />
-
                 {scanMessage}
               </div>
             )}

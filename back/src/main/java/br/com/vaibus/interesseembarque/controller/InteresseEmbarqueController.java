@@ -83,4 +83,25 @@ public class InteresseEmbarqueController {
                     .body(error.getMessage());
         }
     }
+
+    @PutMapping("/confirmar-embarque")
+    public ResponseEntity<String> confirmarEmbarque(
+            @RequestParam Long usuarioId,
+            @RequestParam Long onibusId
+    ) {
+        try {
+            interesseEmbarqueService.confirmarEmbarque(
+                    usuarioId,
+                    onibusId
+            );
+
+            return ResponseEntity.ok(
+                    "Embarque confirmado com sucesso."
+            );
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(error.getMessage());
+        }
+    }
 }

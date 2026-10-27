@@ -23,4 +23,9 @@ public interface InteresseEmbarqueIService {
             Long interesseId,
             StatusInteresseEmbarque status
     );
+
+    void confirmarEmbarque(
+            Long usuarioId,
+            Long onibusId
+    );
 }

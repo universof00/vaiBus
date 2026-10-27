@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +205,50 @@ public class InteresseEmbarqueService implements InteresseEmbarqueIService {
                         );
 
         interesse.setStatus(status);
+
+        interesseEmbarqueRepository.save(interesse);
+    }
+
+    @Override
+    public void confirmarEmbarque(
+            Long usuarioId,
+            Long onibusId
+    ) {
+        InteresseEmbarque interesse =
+                interesseEmbarqueRepository
+                        .findFirstByAluno_IdAndParadaViagem_Viagem_Onibus_IdOrderByIdDesc(
+                                usuarioId,
+                                onibusId
+                        )
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Interesse de embarque não encontrado."
+                                )
+                        );
+
+        if (
+                interesse.getStatus()
+                        == StatusInteresseEmbarque.EMBARCADO
+        ) {
+            return;
+        }
+
+        if (
+                interesse.getStatus()
+                        != StatusInteresseEmbarque.PENDENTE
+        ) {
+            throw new IllegalArgumentException(
+                    "Este embarque não está pendente."
+            );
+        }
+
+        interesse.setStatus(
+                StatusInteresseEmbarque.EMBARCADO
+        );
+
+        interesse.setHorarioEmbarque(
+                LocalDateTime.now()
+        );
 
         interesseEmbarqueRepository.save(interesse);
     }
