@@ -1,6 +1,7 @@
 package br.com.vaibus.interesseembarque.service;
 
 import br.com.vaibus.interesseembarque.entity.InteresseEmbarque;
+import br.com.vaibus.interesseembarque.enums.StatusInteresseEmbarque;
 import br.com.vaibus.interesseembarque.repository.InteresseEmbarqueRepository;
 import br.com.vaibus.paradaviagem.entity.ParadaViagem;
 import br.com.vaibus.paradaviagem.repository.ParadaViagemRepository;
@@ -8,6 +9,11 @@ import br.com.vaibus.usuarios.entity.Usuario;
 import br.com.vaibus.usuarios.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -101,5 +107,103 @@ public class InteresseEmbarqueService implements InteresseEmbarqueIService {
         interesse.setParadaViagem(paradaViagem);
 
         return interesseEmbarqueRepository.save(interesse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> buscarControleEmbarque(
+            Long viagemId
+    ) {
+        List<InteresseEmbarque> interesses =
+                interesseEmbarqueRepository
+                        .findByParadaViagemViagemId(
+                                viagemId
+                        );
+
+        long confirmaram = interesses.size();
+
+        long embarcaram = interesses.stream()
+                .filter(interesse ->
+                        interesse.getStatus()
+                                == StatusInteresseEmbarque.EMBARCADO
+                )
+                .count();
+
+        long aindaNaoChegaram = confirmaram - embarcaram;
+
+        int percentual = confirmaram == 0
+                ? 0
+                : (int) ((embarcaram * 100) / confirmaram);
+
+        List<Map<String, Object>> alunosFaltantes =
+                interesses.stream()
+                        .filter(interesse ->
+                                interesse.getStatus()
+                                        != StatusInteresseEmbarque.EMBARCADO
+                        )
+                        .map(interesse -> {
+                            Map<String, Object> aluno =
+                                    new HashMap<>();
+
+                            aluno.put(
+                                    "interesseId",
+                                    interesse.getId()
+                            );
+
+                            aluno.put(
+                                    "nome",
+                                    interesse.getAluno().getNome()
+                            );
+
+                            aluno.put(
+                                    "ponto",
+                                    interesse.getParadaViagem()
+                                            .getPontoEmbarque()
+                                            .getNome()
+                            );
+
+                            aluno.put(
+                                    "status",
+                                    interesse.getStatus().name()
+                            );
+
+                            return aluno;
+                        })
+                        .toList();
+
+        Map<String, Object> resultado = new HashMap<>();
+
+        resultado.put("confirmaram", confirmaram);
+        resultado.put("embarcaram", embarcaram);
+        resultado.put(
+                "aindaNaoChegaram",
+                aindaNaoChegaram
+        );
+        resultado.put("percentual", percentual);
+        resultado.put(
+                "alunosFaltantes",
+                alunosFaltantes
+        );
+
+        return resultado;
+    }
+
+    @Override
+    public void atualizarStatus(
+            Long interesseId,
+            StatusInteresseEmbarque status
+    ) {
+        InteresseEmbarque interesse =
+                interesseEmbarqueRepository
+                        .findById(interesseId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Interesse não encontrado."
+                                )
+                        );
+
+        interesse.setStatus(status);
+
+        interesseEmbarqueRepository.save(interesse);
     }
 }

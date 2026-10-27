@@ -1,0 +1,342 @@
+.my-trip-page {
+  --trip-primary: #0875e1;
+  --trip-dark: #075484;
+  --trip-text: #153a60;
+  --trip-muted: #74869b;
+  --trip-success: #18b96f;
+  --trip-light-blue: #eaf3ff;
+  --trip-border: #c9dbea;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: var(--trip-text);
+  background: #f8fbfd;
+}
+
+
+.boarding-control-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: 84px;
+  background: #f7faff;
+  color: #07195e;
+}
+
+.boarding-control-content {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 12px 10px 24px;
+}
+
+/* Resumo */
+
+.boarding-summary {
+  padding: 0 6px 10px;
+}
+
+.boarding-summary h2,
+.missing-students h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #07195e;
+}
+
+.boarding-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.summary-card {
+  min-width: 0;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px;
+  border-radius: 8px;
+}
+
+.summary-card-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.summary-card strong {
+  display: block;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.summary-card p {
+  margin: 3px 0 0;
+  font-size: 8px;
+  line-height: 1.1;
+}
+
+.summary-card-confirmed {
+  color: #0866c6;
+  background: #e5f2ff;
+}
+
+.summary-card-confirmed .summary-card-icon {
+  background: #cce6ff;
+}
+
+.summary-card-boarded {
+  color: #009b62;
+  background: #ddf7ec;
+}
+
+.summary-card-boarded .summary-card-icon {
+  background: #b9efd8;
+}
+
+.summary-card-missing {
+  color: #d88600;
+  background: #fff1d4;
+}
+
+.summary-card-missing .summary-card-icon {
+  background: #ffe2a4;
+}
+
+/* Barra de progresso */
+
+.boarding-progress {
+  position: relative;
+  margin-top: 8px;
+}
+
+.boarding-progress-track {
+  height: 10px;
+  margin-right: 100px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dce8eb;
+}
+
+.boarding-progress-value {
+  height: 100%;
+  border-radius: inherit;
+  background: #06b76f;
+  transition: width 0.3s ease;
+}
+
+.boarding-progress-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: -10px;
+  font-size: 8px;
+}
+
+.boarding-progress-info strong {
+  color: #00985d;
+}
+
+.boarding-progress-info span {
+  color: #07195e;
+}
+
+/* Alunos faltantes */
+
+.missing-students {
+  margin-top: 5px;
+  padding: 11px 8px 6px;
+  border: 1px solid #dce5ef;
+  border-radius: 10px;
+  background: #f9fbff;
+}
+
+.missing-students-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.missing-students-header > span {
+  min-width: 21px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #ffe2a4;
+  color: #b97500;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.missing-students-list {
+  margin-top: 4px;
+}
+
+.missing-student-row {
+  display: grid;
+  grid-template-columns:
+    minmax(76px, 1fr)
+    minmax(94px, 1.2fr)
+    auto
+    28px;
+  align-items: center;
+  gap: 6px;
+  min-height: 39px;
+}
+
+.missing-student-name {
+  overflow: hidden;
+  color: #07195e;
+  font-size: 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.missing-student-stop {
+  overflow: hidden;
+  padding: 7px 8px;
+  border-radius: 12px;
+  background: #edf4fc;
+  color: #6783a5;
+  font-size: 8px;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.missing-student-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 14px;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.student-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-pending {
+  background: #e8f2ff;
+  color: #4e729c;
+}
+
+.status-pending .student-status-dot {
+  background: #5b83b3;
+}
+
+.status-absent {
+  background: #ffe3e8;
+  color: #e34058;
+}
+
+.status-absent .student-status-dot {
+  background: #ff5570;
+}
+
+.call-student-button {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #cfe3ff;
+  border-radius: 8px;
+  background: #f2f7ff;
+  color: #1477f8;
+  cursor: pointer;
+}
+
+.call-student-button:active {
+  transform: scale(0.94);
+}
+
+.all-boarded-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #ddf7ec;
+  color: #008e59;
+}
+
+.all-boarded-message p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+/*  */
+
+.boarding-control-header {
+  width: 100%;
+  background-color: #075985;
+}
+
+.boarding-control-header header {
+  background-color: #075985 !important;
+  color: #ffffff !important;
+  border-bottom: none;
+}
+
+.boarding-control-header h1,
+.boarding-control-header h2,
+.boarding-control-header button {
+  color: #ffffff !important;
+}
+
+.boarding-control-header button {
+  background: transparent;
+}
+
+.boarding-control-header svg,
+.boarding-control-header svg path,
+.boarding-control-header svg polyline,
+.boarding-control-header svg line {
+  stroke: #ffffff !important;
+}
+
+/* Telas maiores */
+
+@media (min-width: 600px) {
+  .boarding-control-content {
+    padding: 20px;
+  }
+
+  .summary-card {
+    min-height: 70px;
+    padding: 12px;
+  }
+
+  .summary-card strong {
+    font-size: 22px;
+  }
+
+  .summary-card p,
+  .missing-student-stop,
+  .missing-student-status {
+    font-size: 11px;
+  }
+
+  .missing-student-name {
+    font-size: 13px;
+  }
+
+  
+}

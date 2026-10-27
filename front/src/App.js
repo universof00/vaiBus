@@ -8,6 +8,8 @@ import BusSelection from "./pages/BusSelection";
 import MyTrip from "./pages/MyTrip";
 import Login from "./pages/Login";
 
+import BoardingControl from "./pages/BoardingControl";
+
 function App() {
   return (
     <BrowserRouter>
@@ -17,6 +19,8 @@ function App() {
         <Route path="/nearby" element={<NearbyPoints />} />
         <Route path="/buses" element={<BusSelection />} />
         <Route path="/my-trip" element={<MyTrip />} />
+
+        <Route path="/driver/boarding" element={<BoardingControl />} />
 
       </Routes>
     </BrowserRouter>
